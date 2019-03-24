@@ -2,7 +2,7 @@
   <div>
     <div>
       <h1>{{From.balanceEth}} ETH</h1>
-      <h1>{{From.balanceMt}} MT</h1>
+      <h1>{{From.balanceMt}} {{symbol}}</h1>
     </div>
     <form @submit.prevent="SendToken">
       TO:
@@ -11,9 +11,9 @@
           <option v-for="(account, index) in Accounts" v-if="account.toLowerCase() != From.address" :key="index">{{account}}</option>
         </select>
       </div>
-      <h1>{{To.balanceMt}} MT</h1>
+      <h1>{{To.balanceMt}} {{symbol}}</h1>
       <div>
-        <input type="number" v-model="Value"/>MT
+        <input type="number" v-model="Value"/>{{symbol}}
         <input type="submit" value="Send"/>
       </div>
     </form>
@@ -41,10 +41,14 @@
         tokenContract: null,
         currentBlock: 0,
         transactionCount: 0,
+        symbol: null,
       }
     },
     beforeMount () {
       this.tokenContract = new web3.eth.Contract(artifact.abi, artifact.networks[5777].address)
+      this.tokenContract.methods.symbol().call({from: artifact.networks[5777].address}, (error, symbol) => {
+        this.symbol = symbol
+      })
       web3.eth.getAccounts().then(accounts => {
         this.Accounts = accounts
       })
